@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: fin-doc-assistant
+
+  # profiles
+  profiles:
+    active: local   # локальный профиль,
+
+  # AI: OpenAI
+  ai:
+    openai:
+      chat:
+        temperature: 0.2
+        model: gpt-4o-mini
+
+    # Векторное хранилище
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 1536
+
+  #  Data base
+  datasource:
+    driver-class-name: org.postgresql.Driver
+
+  # Логирование
+logging:
+  level:
+    root: info
+    com.fin.doc: DEBUG
+    org.springframework.ai: DEBUG # видеть, что происходит внутри Spring AI
+

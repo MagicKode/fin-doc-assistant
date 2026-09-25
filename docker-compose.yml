@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg18
+    container_name: fin-doc-assistant-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: fin_assistant
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./docker/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fin_assistant"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
