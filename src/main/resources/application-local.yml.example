@@ -1,8 +1,0 @@
-spring:
-  ai:
-    openai:
-      api-key: sk-your-key-here
-  datasource:
-    url: jdbc:postgresql://localhost:5432/fin_assistant
-    username: postgres
-    password: your-password-here

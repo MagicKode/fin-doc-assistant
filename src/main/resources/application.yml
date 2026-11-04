@@ -2,27 +2,20 @@ spring:
   application:
     name: fin-doc-assistant
 
-  # profiles
-  profiles:
-    active: local   # локальный профиль,
-
   # AI: OpenAI
   ai:
     openai:
+      api-key: ${GROQ_API_KEY}
+      base-url: https://api.groq.com/openai/v1
       chat:
+        model: openai/gpt-oss-120b
         temperature: 0.2
-        model: gpt-4o-mini
-
-    # Векторное хранилище
-    vectorstore:
-      pgvector:
-        initialize-schema: true
-        index-type: HNSW
-        distance-type: COSINE_DISTANCE
-        dimensions: 1536
 
   #  Data base
   datasource:
+    url: jdbc:postgresql://localhost:5433/fin_assistant
+    username: postgres
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
   # Логирование

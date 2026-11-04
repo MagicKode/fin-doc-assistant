@@ -1,6 +1,7 @@
-package fin.doc.assistant.chat;
+package fin.doc.assistant.api.chat.controller;
 
-import org.springframework.ai.chat.client.ChatClient;
+import fin.doc.assistant.api.chat.dto.FinancialReport;
+import fin.doc.assistant.api.service.FinancialExtractionService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,17 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ChatController {
-    private final ChatClient chatClient;
+    private final FinancialExtractionService financialExtractionService;
 
-    public ChatController(ChatClient.Builder chatClientBuilder) {
-        this.chatClient = chatClientBuilder.build();
+    public ChatController(FinancialExtractionService financialExtractionService) {
+        this.financialExtractionService = financialExtractionService;
     }
 
     @GetMapping("/chat")
-    public String chat(@RequestParam String message) {
-        return chatClient.prompt()
-                .user(message)
-                .call()
-                .content();
+    public FinancialReport chat(@RequestParam String message) {
+        return financialExtractionService.extract(message);
     }
 }
