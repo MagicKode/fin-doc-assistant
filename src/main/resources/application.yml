@@ -1,6 +1,11 @@
 spring:
   application:
     name: fin-doc-assistant
+  datasource:
+    url: jdbc:postgresql://localhost:5433/fin_assistant
+    username: postgres
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
 
   # AI: OpenAI
   ai:
@@ -8,15 +13,8 @@ spring:
       api-key: ${GROQ_API_KEY}
       base-url: https://api.groq.com/openai/v1
       chat:
-        model: openai/gpt-oss-120b
+        model: openai/gpt-oss-20b
         temperature: 0.2
-
-  #  Data base
-  datasource:
-    url: jdbc:postgresql://localhost:5433/fin_assistant
-    username: postgres
-    password: ${DB_PASSWORD:postgres}
-    driver-class-name: org.postgresql.Driver
 
   # Логирование
 logging:
@@ -24,4 +22,30 @@ logging:
     root: info
     com.fin.doc: DEBUG
     org.springframework.ai: DEBUG # видеть, что происходит внутри Spring AI
+
+resilience4j:
+  retry:
+    instances:
+      limRetry:
+        max-attempts: 3  # Всего 3 попытки (1 основная + 2 повтора)
+        wait-duration:
+          seconds: 2  # Ждать 2 секунды между попытками
+        retry-exceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - java.util.concurrent.TimeoutException
+          - java.io.IOException
+
+  timelimiter:
+    instances:
+      limTimeLimiter:
+        timeout-duration:
+          seconds: 70  # Если ответа нет 30 секунд — прерываем
+
+  circuitbreaker:
+    instances:
+      limCircuitBreaker:
+        sliding-window-size: 5 # Анализируем последние 5 запросов
+        failure-rate-threshold: 50 # Если 50% (т.е. 3 из 5) упали — размыкаем цепь
+        wait-duration-in-open-state:
+          seconds: 30 # Держим цепь разомкнутой 30 секунд (не стучимся к Groq)
 
