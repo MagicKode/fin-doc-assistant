@@ -9,12 +9,18 @@ spring:
 
   # AI: OpenAI
   ai:
+    model:
+      embedding: transformers
     openai:
       api-key: ${GROQ_API_KEY}
       base-url: https://api.groq.com/openai/v1
       chat:
         model: openai/gpt-oss-20b
         temperature: 0.2
+    vectorstore:
+      pgvector:
+        dimensions: 384
+        initialize-schema: true
 
   # Логирование
 logging:

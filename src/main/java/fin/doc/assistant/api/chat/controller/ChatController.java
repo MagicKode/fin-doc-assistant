@@ -1,13 +1,11 @@
 package fin.doc.assistant.api.chat.controller;
 
 import fin.doc.assistant.api.chat.dto.FinancialReport;
-import fin.doc.assistant.api.service.FinancialExtractionService;
+import fin.doc.assistant.api.service.DocumentIngestionService;
+import fin.doc.assistant.api.service.impl.FinancialExtractionServiceImpl;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -21,14 +19,22 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping("/api/v1")
 @Validated
 public class ChatController {
-    private final FinancialExtractionService financialExtractionService;
+    private final FinancialExtractionServiceImpl financialExtractionServiceImpl;
+    private final DocumentIngestionService documentIngestionService;
 
-    public ChatController(FinancialExtractionService financialExtractionService) {
-        this.financialExtractionService = financialExtractionService;
+    public ChatController(FinancialExtractionServiceImpl financialExtractionServiceImpl, DocumentIngestionService documentIngestionService) {
+        this.financialExtractionServiceImpl = financialExtractionServiceImpl;
+        this.documentIngestionService = documentIngestionService;
     }
 
     @GetMapping("/chat")
     public CompletableFuture<FinancialReport> chat(@RequestParam @NotBlank(message = "Сообщение не должно быть пустым") String message) {
-        return financialExtractionService.extractAsync(message);
+        return financialExtractionServiceImpl.extractAsync(message);
+    }
+
+    @PostMapping("/ingest")
+    public String ingestDocument(@RequestParam String fileName) {
+        documentIngestionService.ingestTextFile(fileName);
+        return "Документ успешно загружен и нарезан";
     }
 }
